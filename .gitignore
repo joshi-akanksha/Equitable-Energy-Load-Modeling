@@ -205,3 +205,18 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ── Project-specific ───────────────────────────────────────────────────────────
+# SERL data (UK Data Service Study 8963) is licensed and must not be published;
+# individual files also exceed GitHub's 100 MB limit. See data/README.md.
+data/*
+!data/README.md
+
+# Generated outputs: recreated by running the notebooks. Keep folder structure only.
+outputs/**
+!outputs/**/
+!outputs/**/.gitkeep
+
+# Local backups and OS clutter
+_backup_before_step0/
+.DS_Store

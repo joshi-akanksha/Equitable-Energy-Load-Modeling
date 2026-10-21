@@ -33,23 +33,26 @@ This repository accompanies the MSc dissertation **“Towards Equitable Energy: 
 
 ## Repository layout
 
-*Notebooks and artifacts included in this repo are listed below. Folder names are suggestions; if you prefer a flat structure, keep paths as-is.*
+Notebooks sit at the repository root and use paths relative to it, so run them from here.
 
 ```
 .
-├─ notebooks/
-│  ├─ EDA - UnivariateYearly.ipynb
-│  ├─ EDA - BiandMultivariate.ipynb
-│  ├─ EDA - NumericAnalysis.ipynb
-│  ├─ TemporalForecasting.ipynb
-│  ├─ DemandModelling 1.ipynb
-│  ├─ DemandModelling 2.ipynb
-│  ├─ TariffSimulation.ipynb
-│  └─ Bibliometric_Analyis.ipynb               # original filename preserved
+├─ EDA - UnivariateYearly.ipynb
+├─ EDA - BiandMultivariate.ipynb
+├─ EDA - NumericAnalysis.ipynb
+├─ TemporalForecasting.ipynb
+├─ DemandModelling 1.ipynb
+├─ DemandModelling 2.ipynb
+├─ TariffSimulation.ipynb
+├─ Bibliometric_Analyis.ipynb      # original filename preserved
+├─ data/                           # inputs, not committed (see data/README.md)
+├─ outputs/                        # everything the notebooks write, not committed
+│  ├─ figures/
+│  └─ artifacts/                   # API caches (geocoding, Google Trends)
 └─ README.md
 ```
 
-> **Note:** Raw SERL data are **not** included (see licensing). Place them locally under `data/serl_8963/` if you create that folder.
+> **Note:** Raw SERL data are **not** included (see licensing). Place them in `data/` using the file names listed in [`data/README.md`](data/README.md).
 
 ---
 
@@ -58,7 +61,7 @@ This repository accompanies the MSc dissertation **“Towards Equitable Energy: 
 Analyses use the **Smart Energy Research Lab (SERL) Study 8963, 2020–2023** aggregated statistics (daily and half-hourly). Access is via the UK Data Service under safeguarded/End User Licence terms.
 
 * Obtain credentials, accept the licence, and download the daily and half-hourly aggregated files for 2020–2023.
-* Store them locally (e.g., `data/serl_8963/`) and update the notebooks’ `DATA_DIR` variable accordingly.
+* Save them in `data/` with the file names listed in [`data/README.md`](data/README.md); no path edits are needed in the notebooks.
 * Respect disclosure controls; publish only allowed aggregates.
 
 ---
@@ -114,9 +117,9 @@ For a clean end-to-end replication, execute notebooks **in the following sequenc
 * `sarima_forecasts.csv` — regional/monthly forecasts with prediction intervals.
 * `subgroup_forecasts.csv` & `forecast_12mo_per_subgroup.csv` — subgroup-level forecast panels.
 * `clustering_results.csv` & `subgroup_ratios_and_clusters.csv` — UMAP/HDBSCAN cluster labels and prevalence by subgroup.
-* `forcasting.csv` — original exported results (filename preserved).
+* `data/Clean_Aggregated_data_2020_2023.csv` — cleaned daily aggregated statistics used as the modelling input (previously named `forcasting.csv`).
 
-These CSVs are produced by the forecasting, clustering, and tariff notebooks and feed the figures/tables in the dissertation.
+These CSVs are written to `outputs/` by the forecasting, clustering, and tariff notebooks and feed the figures/tables in the dissertation.
 
 ---
 
