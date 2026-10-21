@@ -42,6 +42,19 @@ def _standardise(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=[c for c in _DROP if c in df.columns])
 
 
+def make_clean_daily(raw_path: Path | str = DAILY_CSV) -> pd.DataFrame:
+    """Build the cleaned daily-statistics table (data/interim) from the raw SERL file.
+
+    Renames the first two segments (heating fuel, PV), drops the generic segment
+    names and the empty `summary_time` column, and orders rows by period. No values
+    are changed, imputed or clipped: SERL's suppressed cells stay missing.
+    """
+    df = _standardise(pd.read_csv(raw_path)).drop(columns="summary_time")
+    first = ["aggregation_period", "quantity", "unit", "weekday_weekend", "primary_space_heating_fuel", "has_PV"]
+    df = df[first + [c for c in df.columns if c not in first]]
+    return df.sort_values("aggregation_period").reset_index(drop=True)
+
+
 # ── loaders ───────────────────────────────────────────────────────────────────
 def load_monthly(path: Path | str = DAILY_CSV) -> pd.DataFrame:
     """Monthly rows of the daily-statistics file, with a month-start `date` column.

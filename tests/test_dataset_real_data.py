@@ -20,6 +20,11 @@ def half_hourly():
     return serl.load_half_hourly()
 
 
+def test_make_clean_daily_reproduces_interim_file():
+    clean = pd.read_csv(serl.CLEAN_CSV)
+    assert serl.make_clean_daily().equals(clean)
+
+
 def test_clean_file_matches_raw_monthly(monthly):
     clean = serl.load_monthly(serl.CLEAN_CSV)
     assert len(clean) == len(monthly)

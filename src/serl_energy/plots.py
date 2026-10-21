@@ -143,6 +143,13 @@ def half_hour_axis(ax, step_hours: int = 3) -> None:
     ax.set_xticks(range(0, 48, 2 * step_hours), [f"{h:02d}:00" for h in range(0, 24, step_hours)])
 
 
+def year_axis(ax, fmt: str = "%Y") -> None:
+    """Date x axis with one tick per year (avoids crowded month labels on small panels)."""
+    import matplotlib.dates as mdates
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter(fmt))
+
+
 def month_axis(ax, months: Iterable[int] = range(1, 13)) -> None:
     """X axis of calendar months 1–12 with short names."""
     names = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
