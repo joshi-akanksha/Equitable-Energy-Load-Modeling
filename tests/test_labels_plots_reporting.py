@@ -73,3 +73,13 @@ def test_reporter_names_and_writes(tmp_path, monkeypatch):
         r.save_table(pd.DataFrame({"Agile saving %": [1.0]}), "test_table")
     with pytest.raises(ValueError, match="notebook id"):
         reporting.Reporter("EDA - Univariate")
+
+
+def test_snake_case_conversion():
+    assert reporting.to_snake_case("Agile saving %") == "agile_saving_pct"
+    assert reporting.to_snake_case("flat £") == "flat_gbp"
+    assert reporting.to_snake_case("change 2021→23 %") == "change_2021_to_23_pct"
+    assert reporting.to_snake_case("kWh/m²/day") == "kwh_per_m2_per_day"
+    assert reporting.to_snake_case("night 00–06") == "night_00_to_06"
+    df = pd.DataFrame({"Agile £": [1.0]}, index=pd.Index(["a"], name="group"))
+    assert list(reporting.snake_columns(df).columns) == ["group", "agile_gbp"]

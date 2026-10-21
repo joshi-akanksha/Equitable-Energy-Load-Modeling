@@ -130,6 +130,9 @@ def label_line_ends(ax, series: Sequence[tuple[str, Sequence[float], str]], x_en
     placed: list[float] = []
     for y, _, _ in ends:
         placed.append(max(y, placed[-1] + gap) if placed else y)
+    overflow = placed[-1] - (hi - gap / 2) if placed else 0
+    if overflow > 0:                 # keep the stack inside the axes: slide it down as a block
+        placed = [y - overflow for y in placed]
     for (y, label, color), y_text in zip(ends, placed):
         ax.annotate("●", xy=(x_end, y), xytext=(5, 0), textcoords="offset points", va="center", ha="left",
                     fontsize=7, color=color, annotation_clip=False)

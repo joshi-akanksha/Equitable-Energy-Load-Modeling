@@ -18,8 +18,27 @@ import pandas as pd
 from .config import FIGURES_DIR, TABLES_DIR
 
 _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+_SYMBOLS = {"%": " pct ", "£": " gbp ", "→": " to ", "–": " to ", "/": " per ", "²": "2", "+": " plus ", "−": " minus "}
 _SNAKE = re.compile(r"^[a-z0-9]+(_[a-z0-9]+)*$")
 _NOTEBOOK = re.compile(r"^\d+\.\d+-[a-z0-9-]+$")
+
+
+def to_snake_case(name) -> str:
+    """Machine-readable column name from a readable one, e.g. 'Agile saving %' -> 'agile_saving_pct'."""
+    text = str(name)
+    for symbol, word in _SYMBOLS.items():
+        text = text.replace(symbol, word)
+    text = re.sub(r"[^0-9a-zA-Z]+", "_", text).strip("_").lower()
+    return re.sub(r"_+", "_", text) or "value"
+
+
+def snake_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Copy of `df` with the index moved into columns and every column name in snake_case."""
+    out = df.reset_index() if any(n is not None for n in df.index.names) else df.copy()
+    out.columns = [to_snake_case(c) for c in out.columns]
+    if out.columns.duplicated().any():
+        raise ValueError(f"snake_case names collide: {list(out.columns[out.columns.duplicated()])}")
+    return out
 
 
 class Reporter:
