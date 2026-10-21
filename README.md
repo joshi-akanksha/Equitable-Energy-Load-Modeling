@@ -1,5 +1,5 @@
 # BM-11450069-CODE
-This project analyzes UK household electricity use (2020–2023) with SERL smart-meter data. Methods include SARIMA/SARIMAX forecasting, UMAP–HDBSCAN clustering, and tariff simulation. Results show falling demand but stable evening peaks, highlighting inequities and supporting equity-focused demand-response design.
+This project analyses GB household electricity and gas use (2020–2023) with SERL smart-meter data. Methods include ETS/SARIMA(X) forecasting with rolling-origin evaluation, clustering of household-group seasonal profiles, Bayesian weather regression, and tariff simulation with published Octopus Agile prices. Demand fell by about a fifth while the 18:30 evening peak persisted; dynamic pricing lowered 2023 bills for every household group, slightly less so for the most deprived.
 ---
 
 ## Table of contents
@@ -24,10 +24,11 @@ This repository accompanies the MSc dissertation **“Towards Equitable Energy: 
 
 **Core modules**
 
-* **EDA:** seasonal/diurnal structure, subgroup contrasts, distributional diagnostics.
-* **Forecasting:** SARIMA/SARIMAX baselines with weather covariates; expanding-window backtests.
-* **Clustering:** feature engineering of load-shape vectors; UMAP embedding; HDBSCAN density clustering.
-* **Tariff simulation:** half-hourly cost exposure under dynamic vs flat tariffs; equity-oriented comparisons.
+* **EDA:** yearly, seasonal and daily structure; spread between households; differences by dwelling, household, PV, heating fuel and deprivation; temperature response.
+* **Forecasting:** seasonal naive, ETS, SARIMA and SARIMAX with heating degree days for 11 regions; rolling-origin backtest (5 folds × 12 months); 2024 forecasts.
+* **Household groups:** seasonal-shape clusters (k-means) for electricity and gas; personas from seven interpretable features.
+* **Modelling:** Bayesian (PyMC) regression of gas use on heating degree days and solar; time-split ML models for monthly electricity.
+* **Tariff simulation:** Agile vs flat bills from published 2023 prices, load shifting, and comparisons by household group and region.
 
 ---
 
@@ -81,17 +82,13 @@ source .venv/bin/activate            # macOS/Linux
 
 # 3) Install core libraries
 pip install -U pip wheel
-pip install pandas numpy scipy statsmodels scikit-learn umap-learn hdbscan \
-            matplotlib plotly jupyter ipywidgets pydantic requests
+pip install pandas numpy scipy statsmodels scikit-learn matplotlib seaborn \
+            pymc arviz requests jupyter pytest
 
-# Optional (for tidy plots and exporting)
-pip install kaleido openpyxl
-```
-
-*Jupyter extensions:* The notebooks use `ipywidgets`; if widgets don’t render, run:
-
-```bash
-jupyter nbextension enable --py widgetsnbextension
+# Optional: Bibliometric_Analyis.ipynb (zero-shot model, ~1.6 GB download on first run)
+pip install transformers torch
+# Optional: the Google Trends client in the TemporalForecasting appendix
+pip install pytrends
 ```
 
 ---
@@ -100,13 +97,16 @@ jupyter nbextension enable --py widgetsnbextension
 
 For a clean end-to-end replication, execute notebooks **in the following sequence**:
 
-1. **EDA - UnivariateYearly.ipynb** – yearly/seasonal/diurnal structure; basic metrics.
-2. **EDA - BiandMultivariate.ipynb** – subgroup contrasts (EPC, IMD, heating, PV, region).
-3. **EDA - NumericAnalysis.ipynb** – distributional diagnostics; load factor, skew/kurtosis.
-4. **TemporalForecasting.ipynb** – SARIMA/SARIMAX (with meteorology); expanding-window backtests; export `sarima_forecasts.csv` and `forecast_12mo_per_subgroup.csv`.
-5. **DemandModelling.ipynb** – feature engineering; UMAP→HDBSCAN; export `clustering_results.csv` and `subgroup_ratios_and_clusters.csv`.
-6. **TariffSimulation.ipynb** – merge half-hourly demand with tariff schedules; compute exposure vs flat tariffs; export scenario tables.
-7. **Bibliometric\_Analyis.ipynb** – literature scan and figures supporting the methodological framing.
+Each notebook reads the data itself, so they can be run in any order. A natural sequence:
+
+1. **EDA - UnivariateYearly.ipynb** – yearly levels, daily profiles, spread between households, seasonality, differences by dwelling and household.
+2. **EDA - BiandMultivariate.ipynb** – electricity vs gas, PV, heating fuel, weekday/weekend, temperature and solar.
+3. **EDA - NumericAnalysis.ipynb** – derived statistics per half-hour (CV, skewness, confidence intervals).
+4. **TemporalForecasting.ipynb** – regional forecasting and rolling-origin evaluation; 2024 forecasts.
+5. **DemandModelling 1.ipynb** – seasonal patterns and clusters of household groups.
+6. **DemandModelling 2.ipynb** – household-group personas.
+7. **TariffSimulation.ipynb** – Bayesian gas–weather model, time-split ML, and the tariff comparison.
+8. **Bibliometric\_Analyis.ipynb** – literature descriptives and validated zero-shot topic labels.
 
 **Selecting data with `serl_utils.py`.** Each SERL file stacks overlapping household groups (whole sample, heating fuel, PV, region, EPC, tenure, …), each in three units. Averaging across rows without picking one group and one unit mixes them. Use the helper, which raises an error if a filter is missing:
 
@@ -122,25 +122,28 @@ profile = daily_profile(load_half_hourly(), 2023, "Electricity imports", "Wh", t
 
 Run `python -m pytest` to check the helper; the tests that need SERL data are skipped if `data/` is empty.
 
-**Seeds & determinism.** Where applicable, notebooks set random seeds for embeddings/clusterers; GPU is **not required**. Some algorithms (UMAP/HDBSCAN) can exhibit minor non-determinism; fix `random_state` to stabilise runs.
+**Seeds & determinism.** k-means, random forests, gradient boosting, ETS simulations and PyMC sampling use fixed seeds (`random_state=42` / `random_seed=42`). GPU is **not required**.
 
 ---
 
 ## Key outputs
 
-* `sarima_forecasts.csv` — regional/monthly forecasts with prediction intervals.
-* `subgroup_forecasts.csv` & `forecast_12mo_per_subgroup.csv` — subgroup-level forecast panels.
-* `clustering_results.csv` & `subgroup_ratios_and_clusters.csv` — UMAP/HDBSCAN cluster labels and prevalence by subgroup.
-* `data/Clean_Aggregated_data_2020_2023.csv` — cleaned daily aggregated statistics used as the modelling input (previously named `forcasting.csv`).
+All written to `outputs/` (not committed; re-created by running the notebooks):
 
-These CSVs are written to `outputs/` by the forecasting, clustering, and tariff notebooks and feed the figures/tables in the dissertation.
+* `forecast_evaluation.csv`, `forecasts_2024_by_region.csv` — backtest metrics per region/fold/model; 2024 forecasts with 80/95% intervals (TemporalForecasting).
+* `subgroup_seasonality.csv`, `subgroup_clusters.csv` — seasonal measures and clusters per household group (DemandModelling 1).
+* `household_group_features.csv`, `household_group_personas.csv` — persona features and assignments (DemandModelling 2).
+* `gas_weather_bayes_summary.csv`, `ml_2023_test_results.csv`, `tariff_*.csv` — Bayesian summary, 2023 test metrics, tariff tables (TariffSimulation).
+* `repro/covariate_gradients_2023.csv`, `repro/temperature_response_2023.csv` — EDA tables; `out_semantic/` — bibliometric labels and validation.
+
+The modelling input `data/Clean_Aggregated_data_2020_2023.csv` is the cleaned daily statistics file (previously named `forcasting.csv`).
 
 ---
 
 ## Tariff simulation notes
 
 * The last section of `TariffSimulation.ipynb` prices SERL 2023 half-hourly profiles (scaled to monthly consumption) under **Octopus Agile** (half-hourly prices) and **Flexible Octopus** (flat, follows the price cap), using published 2023 rates for one GSP region (`REGION`, default `"C"`).
-* It reports quarterly bills, a load-shifting scenario (moving 10–30% of 16:00–19:00 use to each day's cheapest half-hours) and a comparison by PV status, heating fuel and IMD quintile. Tables are saved to `outputs/tariff_*.csv`.
+* It reports quarterly bills, a load-shifting scenario (moving 10–30% of 16:00–19:00 use to each day's cheapest half-hours) a comparison by PV status, heating fuel and IMD quintile, and a region-by-region comparison using each region's own prices. Tables are saved to `outputs/tariff_*.csv`.
 * Prices come from the public Octopus API (no key needed) via `tariff_utils.py` and are cached in `outputs/artifacts/`. If a download fails with no cache, the code stops with an error; it never substitutes prices.
 * July–December 2023 is the cleanest comparison: published flat rates for January–June 2023 do not consistently reflect the Energy Price Guarantee discount.
 
@@ -148,10 +151,10 @@ These CSVs are written to `outputs/` by the forecasting, clustering, and tariff 
 
 ## Results at a glance
 
-* Mean annual consumption declines over 2020–2023, but the **evening peak persists** across years, seasons, and subgroups.
-* SARIMAX with meteorology improves error relative to seasonal-naïve baselines in most regions (policy-grade, interpretable gains).
-* UMAP→HDBSCAN reveals **behavioural regimes** (e.g., gas-heavy winters, PV-driven midday troughs).
-* Dynamic tariffs can advantage flexible/PV personas but risk **regressive exposure** for inflexible, high-load winter regimes—supporting **segmented, equity-by-design** policies.
+* **Demand fell by about a fifth, mostly in 2022:** electricity imports 10.9 → 8.5 kWh/day and gas 36.9 → 29.1 kWh/day per household (2020 → 2023), while the electricity peak stayed at **18:30** every year.
+* **Forecasting:** on consistent regional series, ETS is most accurate (MASE 0.49, MAPE 7.8%); all models beat seasonal naive (Wilcoxon p ≤ 0.02 across 11 regions). Heating degree days do not improve forecasts when future weather must be estimated (p = 0.41).
+* **Who is different:** electric-heated and PV homes form a distinct, strongly seasonal electricity cluster (winter ≈ 2.8× summer vs 1.5× for others). Electric-heated homes use 26.7 kWh/day of electricity on −5 to 0 °C days vs 7.0 on warm days. Gas seasonality is near-universal: +5.2 kWh/day per heating degree-day (Bayesian, R² 0.92).
+* **Tariffs (Jul–Dec 2023):** Agile was 32% cheaper than the flat tariff for the average household in London (20–32% across regions). Every group benefited, but the most deprived quintile gained least (31.0% vs 32.0%) and has the highest share of use at 16:00–19:00. Moving 20% of that use to cheap hours saved about £11 more per half-year.
 
 ---
 
