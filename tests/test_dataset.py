@@ -1,9 +1,9 @@
-"""Unit tests for serl_utils on small synthetic tables (no SERL data needed)."""
+"""Unit tests for serl_energy.dataset on small synthetic tables (no SERL data needed)."""
 import numpy as np
 import pandas as pd
 import pytest
 
-from serl_utils import _standardise, daily_profile, monthly_panel, monthly_series, select_slice
+from serl_energy.dataset import _standardise, daily_profile, monthly_panel, monthly_series, select_slice
 
 
 def make_monthly(months=3):

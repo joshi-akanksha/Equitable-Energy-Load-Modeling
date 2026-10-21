@@ -12,7 +12,7 @@ raises an error when a filter is missing instead of silently mixing groups.
 
 Example
 -------
->>> from serl_utils import load_monthly, monthly_series, monthly_panel
+>>> from serl_energy.dataset import load_monthly, monthly_series, monthly_panel
 >>> df = load_monthly()
 >>> y = monthly_series(df, "Electricity net", "kWh/day")              # 48 months
 >>> regions = monthly_panel(df, "Electricity net", "kWh/day", "region") # 48 x 11
@@ -24,17 +24,11 @@ from typing import Iterable, Optional
 
 import pandas as pd
 
-# ── file locations (relative to this file, so they work from any cwd) ─────────
-PROJECT_DIR = Path(__file__).resolve().parent
-DATA_DIR = PROJECT_DIR / "data"
-DAILY_CSV = DATA_DIR / "serl_daily_energy_use_in_gb_domestic_buildings_2020_to_2023_aggregated_statistics.csv"
-CLEAN_CSV = DATA_DIR / "Clean_Aggregated_data_2020_2023.csv"
+from .config import CLEAN_DAILY_CSV as CLEAN_CSV
+from .config import SERL_DAILY_CSV as DAILY_CSV
+from .config import serl_half_hourly_csv as half_hourly_csv
+
 YEARS = (2020, 2021, 2022, 2023)
-
-
-def half_hourly_csv(year: int) -> Path:
-    """Path of the half-hourly aggregated statistics file for `year`."""
-    return DATA_DIR / f"serl_half_hourly_energy_use_in_gb_domestic_buildings_{year}_aggregated_statistics.csv"
 
 
 # raw SERL files name the first two segments generically; the clean file does not

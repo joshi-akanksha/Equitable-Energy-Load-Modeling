@@ -209,13 +209,23 @@ __marimo__/
 # ── Project-specific ───────────────────────────────────────────────────────────
 # SERL data (UK Data Service Study 8963) is licensed and must not be published;
 # individual files also exceed GitHub's 100 MB limit. See data/README.md.
-data/*
+# Keep only the folder skeleton and the README.
+data/**
+!data/**/
+!data/**/.gitkeep
 !data/README.md
 
-# Generated outputs: recreated by running the notebooks. Keep folder structure only.
-outputs/**
-!outputs/**/
-!outputs/**/.gitkeep
+# Generated results: recreated by `python scripts/run_all.py`. Keep folder skeleton only.
+reports/figures/**
+reports/tables/**
+!reports/figures/**/
+!reports/tables/**/
+!reports/**/.gitkeep
+
+# Dashboard build output and dependencies
+dashboard/node_modules/
+dashboard/.next/
+dashboard/out/
 
 # Local backups and OS clutter
 _backup_before_step0/

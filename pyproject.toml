@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "serl-energy"
+version = "1.0.0"
+description = "Temporal load modelling and dynamic-tariff equity analysis on SERL smart-meter statistics"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Akanksha Joshi" }]
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+notebooks = [
+    "scipy", "statsmodels", "scikit-learn", "seaborn", "pymc", "arviz",
+    "hdbscan", "umap-learn", "requests", "jupyter", "nbclient", "nbformat",
+]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

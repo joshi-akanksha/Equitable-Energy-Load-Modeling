@@ -1,10 +1,10 @@
 """Electricity bills for SERL consumption profiles under published Octopus tariffs.
 
 Prices come from the public Octopus Energy API (no key needed) and are cached
-in outputs/artifacts/ so later runs work offline. If a download fails and
+in data/external/octopus/ so later runs work offline. If a download fails and
 nothing is cached, an error is raised; no prices are ever invented.
 
-Consumption is built from SERL data (see serl_utils):
+Consumption is built from SERL data (see serl_energy.dataset):
 - the annual mean half-hourly profile gives the *shape* of a day
   (separately for weekdays and weekends where SERL provides it),
 - the monthly mean daily consumption gives the *level* for each month.
@@ -24,8 +24,10 @@ from typing import Mapping, Optional
 import numpy as np
 import pandas as pd
 
+from .config import OCTOPUS_CACHE_DIR
+
 OCTOPUS_API = "https://api.octopus.energy/v1/products"
-ARTIFACTS_DIR = Path(__file__).resolve().parent / "outputs" / "artifacts"
+ARTIFACTS_DIR = OCTOPUS_CACHE_DIR
 
 # products checked against the API's availability dates; rates stay published for
 # customers who joined while a product was on sale, so each covers the full year below
