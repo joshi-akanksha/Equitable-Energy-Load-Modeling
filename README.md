@@ -158,6 +158,7 @@ The modelling input `data/Clean_Aggregated_data_2020_2023.csv` is the cleaned da
 * **Forecasting:** on consistent regional series, ETS is most accurate (MASE 0.49, MAPE 7.8%); all models beat seasonal naive (Wilcoxon p ≤ 0.02 across 11 regions). Heating degree days do not improve forecasts when future weather must be estimated (p = 0.41).
 * **Who is different:** electric-heated and PV homes form a distinct, strongly seasonal electricity cluster (winter ≈ 2.8× summer vs 1.5× for others). Electric-heated homes use 26.7 kWh/day of electricity on −5 to 0 °C days vs 7.0 on warm days. Gas seasonality is near-universal: +5.2 kWh/day per heating degree-day (Bayesian, R² 0.92).
 * **Tariffs (Jul–Dec 2023):** Agile was 32% cheaper than the flat tariff for the average household in London (20–32% across regions). Every group benefited, but the most deprived quintile gained least (31.0% vs 32.0%) and has the highest share of use at 16:00–19:00. Moving 20% of that use to cheap hours saved about £11 more per half-year.
+* **Crisis test (Apr–Dec 2022):** priced with the Agile product available at the height of the crisis, every group would have paid about **23–24% more** than on the flat tariff (August 2022 bills roughly doubled), and load shifting barely helped. Dynamic tariffs pass wholesale-price risk to households: timing differences between deprived and other households change bills by about one percentage point, whereas standing charges, access barriers and price spikes matter far more (`EnergyPovertyTariffs.ipynb`).
 
 ---
 
