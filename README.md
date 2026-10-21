@@ -108,6 +108,20 @@ For a clean end-to-end replication, execute notebooks **in the following sequenc
 6. **TariffSimulation.ipynb** – merge half-hourly demand with tariff schedules; compute exposure vs flat tariffs; export scenario tables.
 7. **Bibliometric\_Analyis.ipynb** – literature scan and figures supporting the methodological framing.
 
+**Selecting data with `serl_utils.py`.** Each SERL file stacks overlapping household groups (whole sample, heating fuel, PV, region, EPC, tenure, …), each in three units. Averaging across rows without picking one group and one unit mixes them. Use the helper, which raises an error if a filter is missing:
+
+```python
+from serl_utils import load_monthly, monthly_series, monthly_panel, load_half_hourly, daily_profile
+
+df = load_monthly()
+gas = monthly_series(df, "Gas", "kWh/day")                                   # whole sample, 48 months
+regions = monthly_panel(df, "Electricity net", "kWh/day", "region")          # 48 months x 11 regions
+pv = monthly_series(df, "Electricity imports", "kWh/day", pv="Yes")          # PV households only
+profile = daily_profile(load_half_hourly(), 2023, "Electricity imports", "Wh", to_kwh=True)  # 48 half-hours
+```
+
+Run `python -m pytest` to check the helper; the tests that need SERL data are skipped if `data/` is empty.
+
 **Seeds & determinism.** Where applicable, notebooks set random seeds for embeddings/clusterers; GPU is **not required**. Some algorithms (UMAP/HDBSCAN) can exhibit minor non-determinism; fix `random_state` to stabilise runs.
 
 ---
