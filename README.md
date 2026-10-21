@@ -45,6 +45,7 @@ Notebooks sit at the repository root and use paths relative to it, so run them f
 ├─ DemandModelling 1.ipynb
 ├─ DemandModelling 2.ipynb
 ├─ TariffSimulation.ipynb
+├─ EnergyPovertyTariffs.ipynb
 ├─ Bibliometric_Analyis.ipynb      # original filename preserved
 ├─ data/                           # inputs, not committed (see data/README.md)
 ├─ outputs/                        # everything the notebooks write, not committed
@@ -106,7 +107,8 @@ Each notebook reads the data itself, so they can be run in any order. A natural 
 5. **DemandModelling 1.ipynb** – seasonal patterns and clusters of household groups.
 6. **DemandModelling 2.ipynb** – household-group personas.
 7. **TariffSimulation.ipynb** – Bayesian gas–weather model, time-split ML, and the tariff comparison.
-8. **Bibliometric\_Analyis.ipynb** – literature descriptives and validated zero-shot topic labels.
+8. **EnergyPovertyTariffs.ipynb** – HDBSCAN groupings of household types, energy-poverty signals, SARIMA 2024 forecasts, and 2024 Agile vs flat bills with flexibility- and access-gap scenarios.
+9. **Bibliometric\_Analyis.ipynb** – literature descriptives and validated zero-shot topic labels.
 
 **Selecting data with `serl_utils.py`.** Each SERL file stacks overlapping household groups (whole sample, heating fuel, PV, region, EPC, tenure, …), each in three units. Averaging across rows without picking one group and one unit mixes them. Use the helper, which raises an error if a filter is missing:
 
@@ -134,6 +136,7 @@ All written to `outputs/` (not committed; re-created by running the notebooks):
 * `subgroup_seasonality.csv`, `subgroup_clusters.csv` — seasonal measures and clusters per household group (DemandModelling 1).
 * `household_group_features.csv`, `household_group_personas.csv` — persona features and assignments (DemandModelling 2).
 * `gas_weather_bayes_summary.csv`, `ml_2023_test_results.csv`, `tariff_*.csv` — Bayesian summary, 2023 test metrics, tariff tables (TariffSimulation).
+* `energy_poverty/` — HDBSCAN cells and groups, composition check, signals, asset access, SARIMA 2024 forecasts, 2024 bills and scenarios (EnergyPovertyTariffs).
 * `repro/covariate_gradients_2023.csv`, `repro/temperature_response_2023.csv` — EDA tables; `out_semantic/` — bibliometric labels and validation.
 
 The modelling input `data/Clean_Aggregated_data_2020_2023.csv` is the cleaned daily statistics file (previously named `forcasting.csv`).

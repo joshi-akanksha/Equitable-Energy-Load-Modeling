@@ -27,21 +27,23 @@ import pandas as pd
 OCTOPUS_API = "https://api.octopus.energy/v1/products"
 ARTIFACTS_DIR = Path(__file__).resolve().parent / "outputs" / "artifacts"
 
-# products that applied to 2023 (checked against the API's availability dates)
-AGILE_PRODUCT = "AGILE-FLEX-22-11-25"   # Agile Octopus November 2022 v1
-FLEX_PRODUCT = "VAR-22-11-01"           # Flexible Octopus (standard variable, follows the price cap)
+# products checked against the API's availability dates; rates stay published for
+# customers who joined while a product was on sale, so each covers the full year below
+AGILE_PRODUCT = "AGILE-FLEX-22-11-25"   # Agile Octopus November 2022 v1 (covers 2023)
+AGILE_PRODUCT_2024 = "AGILE-23-12-06"   # Agile Octopus December 2023 v1 (covers 2024)
+FLEX_PRODUCT = "VAR-22-11-01"           # Flexible Octopus (standard variable, follows the price cap; 2023-2024)
 
 UK_TZ = "Europe/London"
 
 
-def agile_code(region: str) -> str:
-    """Tariff code for Agile in a GSP region letter (A–P)."""
-    return f"E-1R-{AGILE_PRODUCT}-{region}"
+def agile_code(region: str, product: str = AGILE_PRODUCT) -> str:
+    """Tariff code for an Agile product in a GSP region letter (A–P)."""
+    return f"E-1R-{product}-{region}"
 
 
-def flex_code(region: str) -> str:
-    """Tariff code for Flexible Octopus in a GSP region letter (A–P)."""
-    return f"E-1R-{FLEX_PRODUCT}-{region}"
+def flex_code(region: str, product: str = FLEX_PRODUCT) -> str:
+    """Tariff code for a Flexible Octopus product in a GSP region letter (A–P)."""
+    return f"E-1R-{product}-{region}"
 
 
 # ── downloading (cached) ──────────────────────────────────────────────────────

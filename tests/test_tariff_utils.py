@@ -72,6 +72,12 @@ def test_bill_and_compare():
     assert table.loc[0, "total_gbp"] == pytest.approx(10.6)
 
 
+def test_tariff_codes():
+    assert tu.agile_code("C") == "E-1R-AGILE-FLEX-22-11-25-C"
+    assert tu.agile_code("C", tu.AGILE_PRODUCT_2024) == "E-1R-AGILE-23-12-06-C"
+    assert tu.flex_code("N") == "E-1R-VAR-22-11-01-N"
+
+
 def test_series_without_timezone_aware_index_is_rejected():
     naive = pd.Series(1.0, index=pd.date_range("2023-01-01", periods=48, freq="30min"))
     price = pd.Series(20.0, index=naive.index)
