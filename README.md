@@ -139,9 +139,10 @@ These CSVs are written to `outputs/` by the forecasting, clustering, and tariff 
 
 ## Tariff simulation notes
 
-* The tariff notebook aligns half-hourly demand with time-varying unit rates (e.g., Agile-type products).
-* Public endpoints often suffice, but if an API key/region code is required, set environment variables (e.g., `OCTOPUS_REGION`, `OCTOPUS_API_KEY`) and follow the notebook’s prompts.
-* Outputs compare **dynamic vs flat** exposure by persona/cluster and flag potential regressive effects.
+* The last section of `TariffSimulation.ipynb` prices SERL 2023 half-hourly profiles (scaled to monthly consumption) under **Octopus Agile** (half-hourly prices) and **Flexible Octopus** (flat, follows the price cap), using published 2023 rates for one GSP region (`REGION`, default `"C"`).
+* It reports quarterly bills, a load-shifting scenario (moving 10–30% of 16:00–19:00 use to each day's cheapest half-hours) and a comparison by PV status, heating fuel and IMD quintile. Tables are saved to `outputs/tariff_*.csv`.
+* Prices come from the public Octopus API (no key needed) via `tariff_utils.py` and are cached in `outputs/artifacts/`. If a download fails with no cache, the code stops with an error; it never substitutes prices.
+* July–December 2023 is the cleanest comparison: published flat rates for January–June 2023 do not consistently reflect the Energy Price Guarantee discount.
 
 ---
 
