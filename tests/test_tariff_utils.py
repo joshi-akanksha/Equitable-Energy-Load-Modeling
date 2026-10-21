@@ -34,7 +34,7 @@ def test_consumption_matches_monthly_level():
     monthly = pd.Series([10.0, 8.0], index=pd.to_datetime(["2023-01-01", "2023-02-01"]))
     idx = tu.half_hour_index("2023-01-30", "2023-02-02")
     kwh = tu.build_consumption({"both": profile}, monthly, idx)
-    daily = kwh.groupby(kwh.index.date).sum()
+    daily = kwh.groupby(idx.date).sum()
     assert daily.round(9).tolist() == [10.0, 10.0, 8.0]
     assert kwh.iloc[47] > kwh.iloc[0]  # shape is kept
 
@@ -45,7 +45,7 @@ def test_weekday_weekend_split_keeps_ratio():
     monthly = pd.Series([10.0], index=pd.to_datetime(["2023-01-01"]))
     idx = tu.half_hour_index("2023-01-06", "2023-01-08")  # Friday, Saturday
     daily = tu.build_consumption(profiles, monthly, idx)
-    daily = daily.groupby(daily.index.date).sum().round(9)
+    daily = daily.groupby(idx.date).sum().round(9)
     assert daily.tolist() == [9.0, 12.0]
 
 
@@ -72,8 +72,17 @@ def test_bill_and_compare():
     assert table.loc[0, "total_gbp"] == pytest.approx(10.6)
 
 
+def test_series_without_timezone_aware_index_is_rejected():
+    naive = pd.Series(1.0, index=pd.date_range("2023-01-01", periods=48, freq="30min"))
+    price = pd.Series(20.0, index=naive.index)
+    with pytest.raises(TypeError, match="timezone-aware"):
+        tu.shift_peak(naive, price, 0.2)
+    with pytest.raises(TypeError, match="timezone-aware"):
+        tu.compare(pd.Series([1.0, 2.0]), {"flat": (price, price)})
+
+
 def test_download_failure_without_cache_raises(tmp_path, monkeypatch):
-    def offline(url, timeout=30):
+    def offline(*_args, **_kwargs):
         raise OSError("no network")
     monkeypatch.setattr(tu, "_get_all", offline)
     with pytest.raises(RuntimeError, match="no cache"):

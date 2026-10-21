@@ -1,4 +1,5 @@
 """Checks against the real SERL files. Skipped when data/ is not present."""
+import pandas as pd
 import pytest
 
 import serl_utils as su
@@ -44,6 +45,7 @@ def test_region_panel(monthly):
 
 def test_gas_peaks_in_winter(monthly):
     s = su.monthly_series(monthly, "Gas", "kWh/day")
+    assert isinstance(s.index, pd.DatetimeIndex)
     by_month = s.groupby(s.index.month).mean()
     assert by_month.idxmax() in (12, 1, 2)
     assert by_month.idxmin() in (6, 7, 8)

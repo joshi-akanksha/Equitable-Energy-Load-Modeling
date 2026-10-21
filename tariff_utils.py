@@ -131,6 +131,17 @@ def daily_standing_charges(standing: pd.DataFrame, start: str, end: str) -> pd.S
     return s.rename("p_per_day")
 
 
+def _uk_times(s: pd.Series) -> pd.DatetimeIndex:
+    """The series' half-hour start times in UK clock time.
+
+    Raises TypeError unless `s` is indexed by timezone-aware timestamps
+    (as produced by `half_hour_index` / `build_consumption`).
+    """
+    if not isinstance(s.index, pd.DatetimeIndex) or s.index.tz is None:
+        raise TypeError("expected a series indexed by timezone-aware timestamps (see half_hour_index)")
+    return s.index.tz_convert(UK_TZ)
+
+
 # ── consumption ───────────────────────────────────────────────────────────────
 def build_consumption(
     profiles: Mapping[str, pd.Series],
@@ -189,7 +200,7 @@ def shift_peak(
     energy is spread evenly over the `n_cheapest` lowest-priced half-hours of
     the same UK day outside the peak window. Total daily energy is unchanged.
     """
-    local = kwh.index.tz_convert(UK_TZ)
+    local = _uk_times(kwh)
     hhmm = local.strftime("%H:%M")
     in_peak = (hhmm >= peak[0]) & (hhmm < peak[1])
     df = pd.DataFrame({"kwh": kwh.to_numpy(), "p": p_per_kwh.reindex(kwh.index).to_numpy(),
@@ -212,7 +223,7 @@ def bill(kwh: pd.Series, p_per_kwh: pd.Series, standing_p_per_day: pd.Series) ->
     p = p_per_kwh.reindex(kwh.index)
     if p.isna().any():
         raise ValueError("price series does not cover all half-hours")
-    days = pd.Index(kwh.index.tz_convert(UK_TZ).date).unique()
+    days = pd.Index(_uk_times(kwh).date).unique()
     energy = float((kwh * p).sum()) / 100
     standing = float(standing_p_per_day.reindex(days).sum()) / 100
     total_kwh = float(kwh.sum())
@@ -225,7 +236,7 @@ def compare(kwh: pd.Series, tariffs: Mapping[str, tuple[pd.Series, pd.Series]], 
 
     `tariffs` maps a name to (half-hourly p/kWh, daily standing p/day).
     """
-    period = kwh.index.tz_convert(UK_TZ).tz_localize(None).to_period(by)
+    period = _uk_times(kwh).tz_localize(None).to_period(by)
     rows = []
     for per in period.unique():
         part = kwh[period == per]

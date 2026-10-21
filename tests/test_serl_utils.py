@@ -65,7 +65,7 @@ def test_monthly_series_keeps_gaps_as_nan():
     df = df[df["date"] != "2023-02-01"]  # suppressed month
     s = monthly_series(df, "Electricity net", "kWh/day")
     assert len(s) == 4 and s.isna().sum() == 1
-    assert s.index.freqstr == "MS"
+    assert isinstance(s.index, pd.DatetimeIndex) and s.index.freqstr == "MS"
 
 
 def test_monthly_series_requires_segment_value():
