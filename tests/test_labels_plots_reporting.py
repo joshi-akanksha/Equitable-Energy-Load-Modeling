@@ -71,6 +71,8 @@ def test_reporter_names_and_writes(tmp_path, monkeypatch):
         r.save_fig(fig, "Test Figure")
     with pytest.raises(ValueError, match="snake_case"):
         r.save_table(pd.DataFrame({"Agile saving %": [1.0]}), "test_table")
+    with pytest.raises(ValueError, match="snake_case"):
+        r.save_table(pd.DataFrame({"2024_forecast": [1.0]}), "test_table")
     with pytest.raises(ValueError, match="notebook id"):
         reporting.Reporter("EDA - Univariate")
 

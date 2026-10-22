@@ -1,0 +1,37 @@
+# Pinned environment the notebooks were last run with (Python 3.12.4, macOS).
+#   python -m venv .venv && source .venv/bin/activate
+#   pip install -r requirements.txt
+# The project package (src/serl_energy) is installed in editable mode by the last line.
+
+# core analysis
+numpy==1.26.4
+pandas==2.2.3
+scipy==1.11.3
+statsmodels==0.14.2
+scikit-learn==1.7.1
+matplotlib==3.8.4
+
+# Bayesian model (4.1) and clustering (4.2)
+pymc==5.25.1
+arviz==0.22.0
+hdbscan==0.8.40
+umap-learn==0.5.9.post2
+
+# notebooks, scripts and tests
+jupyterlab==4.0.11
+ipykernel==6.28.0
+nbclient==0.8.0
+nbformat==5.9.2
+pytest==7.4.4
+
+# optional: 5.1 literature review (zero-shot model, ~1.6 GB download on first run)
+transformers==4.55.2
+torch>=2.3
+
+# optional: unused API clients in the 2.1 appendix
+requests==2.32.2
+seaborn==0.13.2
+pytrends==4.9.2
+urllib3<2
+
+-e .

@@ -5,8 +5,8 @@
     reporter.save_table(df, "covariate_gradients_2023") # reports/tables/1.1-eda-univariate/covariate_gradients_2023.csv
 
 Naming rules (checked here so they cannot drift): figure names are kebab-case,
-table names and every column / index name are snake_case, so tables load
-cleanly into code and the dashboard. Readable labels belong on charts only.
+table names and every column / index name are snake_case starting with a
+letter, so tables load cleanly into code and the dashboard. Readable labels belong on charts only.
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from .config import FIGURES_DIR, TABLES_DIR
 
 _KEBAB = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 _SYMBOLS = {"%": " pct ", "£": " gbp ", "→": " to ", "–": " to ", "/": " per ", "²": "2", "+": " plus ", "−": " minus "}
-_SNAKE = re.compile(r"^[a-z0-9]+(_[a-z0-9]+)*$")
+_SNAKE = re.compile(r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$")      # leading letter: safe as a JS / pandas attribute
 _NOTEBOOK = re.compile(r"^\d+\.\d+-[a-z0-9-]+$")
 
 

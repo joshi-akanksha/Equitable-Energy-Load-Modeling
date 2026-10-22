@@ -24,9 +24,12 @@ from typing import Iterable, Optional
 
 import pandas as pd
 
-from .config import CLEAN_DAILY_CSV as CLEAN_CSV
-from .config import SERL_DAILY_CSV as DAILY_CSV
-from .config import serl_half_hourly_csv as half_hourly_csv
+from . import config
+
+# file locations, re-exported so notebooks can write serl.CLEAN_CSV
+DAILY_CSV = config.SERL_DAILY_CSV
+CLEAN_CSV = config.CLEAN_DAILY_CSV
+half_hourly_csv = config.serl_half_hourly_csv
 
 YEARS = (2020, 2021, 2022, 2023)
 
